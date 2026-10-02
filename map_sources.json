@@ -1,0 +1,99 @@
+{
+ "proxy_used": "grc.io0.co",
+ "test_point": {
+  "lat": 29.36571,
+  "lon": 113.70378
+ },
+ "sources": [
+  {
+   "name": "谷歌卫星影像",
+   "url": "https://grc.io0.co/maps/vt?lyrs=s&v=982&gl=cn&x={x}&y={y}&z={z}",
+   "type": "xyz",
+   "maxzoom_catalog": 21,
+   "note": "谷歌原始卫星瓦片，全球覆盖",
+   "status": "OK",
+   "maxzoom": 21
+  },
+  {
+   "name": "谷歌混合图",
+   "url": "https://grc.io0.co/maps/vt?lyrs=y&v=982&gl=cn&x={x}&y={y}&z={z}",
+   "type": "xyz",
+   "maxzoom_catalog": 21,
+   "note": "卫星影像+路网地名标注",
+   "status": "OK",
+   "maxzoom": 21
+  },
+  {
+   "name": "谷歌路网图",
+   "url": "https://grc.io0.co/maps/vt?lyrs=m&v=982&gl=cn&x={x}&y={y}&z={z}",
+   "type": "xyz",
+   "maxzoom_catalog": 21,
+   "note": "标准道路地图",
+   "status": "OK",
+   "maxzoom": null
+  },
+  {
+   "name": "谷歌地形图",
+   "url": "https://grc.io0.co/maps/vt?lyrs=p&v=982&gl=cn&x={x}&y={y}&z={z}",
+   "type": "xyz",
+   "maxzoom_catalog": 21,
+   "note": "带等高线阴影的地形图",
+   "status": "OK",
+   "maxzoom": null
+  },
+  {
+   "name": "Esri卫星影像",
+   "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+   "type": "xyz",
+   "maxzoom_catalog": 19,
+   "note": "免费无密钥，注意y在x前；中国乡村一般到18-19级",
+   "status": "OK",
+   "maxzoom": 18
+  },
+  {
+   "name": "Bing卫星影像",
+   "url": "https://ecn.t3.tiles.virtualearth.net/tiles/a{q}.jpeg?g=14000",
+   "type": "quadkey",
+   "maxzoom_catalog": 19,
+   "note": "免费无密钥，{q}为四叉树键（QGIS不支持{q}，LSV/SAS Planet支持）",
+   "status": "OK",
+   "maxzoom": 19
+  },
+  {
+   "name": "高德卫星影像",
+   "url": "https://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}",
+   "type": "xyz",
+   "maxzoom_catalog": 18,
+   "note": "⚠GCJ-02偏移约500m，叠WGS84数据会错位",
+   "status": "OK",
+   "maxzoom": 18
+  },
+  {
+   "name": "高德路网图",
+   "url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+   "type": "xyz",
+   "maxzoom_catalog": 18,
+   "note": "⚠GCJ-02偏移约500m",
+   "status": "OK",
+   "maxzoom": null
+  },
+  {
+   "name": "OpenStreetMap",
+   "url": "https://a.tile.osm.org/{z}/{x}/{y}.png",
+   "type": "xyz",
+   "maxzoom_catalog": 19,
+   "note": "OSM标准图层（osm.org备用域名，openstreetmap.org主域被墙）",
+   "status": "OK",
+   "maxzoom": null
+  },
+  {
+   "name": "ArcGIS Wayback 2024-11",
+   "url": "https://wayback-b.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/44710/{z}/{y}/{x}",
+   "type": "xyz",
+   "maxzoom_catalog": 19,
+   "note": "Esri历史影像快照",
+   "status": "OK",
+   "maxzoom": 17
+  }
+ ]
+}
