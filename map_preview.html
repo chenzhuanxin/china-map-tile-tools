@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8"/>
+<title>国内可用地图图层源预览</title>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://s4.zstatic.net/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+ html,body,#map{height:100%;margin:0}
+ .coord{background:#fff;padding:2px 8px;font:12px monospace}
+ .warn{color:#c00;font-size:11px}
+ .leaflet-control-layers{font-size:13px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+const SOURCES = [{"name": "谷歌卫星影像", "url": "https://grc.io0.co/maps/vt?lyrs=s&v=982&gl=cn&x={x}&y={y}&z={z}", "type": "xyz", "maxzoom_catalog": 21, "note": "谷歌原始卫星瓦片，全球覆盖", "status": "OK", "maxzoom": 21}, {"name": "谷歌混合图", "url": "https://grc.io0.co/maps/vt?lyrs=y&v=982&gl=cn&x={x}&y={y}&z={z}", "type": "xyz", "maxzoom_catalog": 21, "note": "卫星影像+路网地名标注", "status": "OK", "maxzoom": 21}, {"name": "谷歌路网图", "url": "https://grc.io0.co/maps/vt?lyrs=m&v=982&gl=cn&x={x}&y={y}&z={z}", "type": "xyz", "maxzoom_catalog": 21, "note": "标准道路地图", "status": "OK", "maxzoom": null}, {"name": "谷歌地形图", "url": "https://grc.io0.co/maps/vt?lyrs=p&v=982&gl=cn&x={x}&y={y}&z={z}", "type": "xyz", "maxzoom_catalog": 21, "note": "带等高线阴影的地形图", "status": "OK", "maxzoom": null}, {"name": "Esri卫星影像", "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", "type": "xyz", "maxzoom_catalog": 19, "note": "免费无密钥，注意y在x前；中国乡村一般到18-19级", "status": "OK", "maxzoom": 18}, {"name": "Bing卫星影像", "url": "https://ecn.t3.tiles.virtualearth.net/tiles/a{q}.jpeg?g=14000", "type": "quadkey", "maxzoom_catalog": 19, "note": "免费无密钥，{q}为四叉树键（QGIS不支持{q}，LSV/SAS Planet支持）", "status": "OK", "maxzoom": 19}, {"name": "高德卫星影像", "url": "https://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}", "type": "xyz", "maxzoom_catalog": 18, "note": "⚠GCJ-02偏移约500m，叠WGS84数据会错位", "status": "OK", "maxzoom": 18}, {"name": "高德路网图", "url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}", "type": "xyz", "maxzoom_catalog": 18, "note": "⚠GCJ-02偏移约500m", "status": "OK", "maxzoom": null}, {"name": "OpenStreetMap", "url": "https://a.tile.osm.org/{z}/{x}/{y}.png", "type": "xyz", "maxzoom_catalog": 19, "note": "OSM标准图层（osm.org备用域名，openstreetmap.org主域被墙）", "status": "OK", "maxzoom": null}, {"name": "ArcGIS Wayback 2024-11", "url": "https://wayback-b.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/44710/{z}/{y}/{x}", "type": "xyz", "maxzoom_catalog": 19, "note": "Esri历史影像快照", "status": "OK", "maxzoom": 17}];
+const AOI = {"lat": 29.36571, "lon": 113.70378, "zoom": 15, "lat1": 29.36178, "lon1": 113.70284, "lat2": 29.36964, "lon2": 113.70472};
+const map = L.map('map',{zoomControl:true}).setView([AOI.lat,AOI.lon], AOI.zoom);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'OSM'}).addTo(map);
+const base = {};
+let first = true;
+for (const s of SOURCES) {
+  if (s.status !== 'OK') continue;
+  const opt = {maxZoom: s.maxzoom || s.maxzoom_catalog, attribution: s.name};
+  let layer;
+  if (s.type === 'quadkey') {
+    // Leaflet 不支持 {q}，做一层转换
+    layer = L.tileLayer('', opt);
+    layer.getTileUrl = function(c) {
+      let q=''; const n=1<<c.z;
+      for (let i=c.z;i>0;i--){let d=0;const m=1<<(i-1);
+        if(c.x&m)d+=1; if(c.y&m)d+=2; q+=d;}
+      return s.url.replace('{q}',q);
+    };
+  } else {
+    layer = L.tileLayer(s.url, opt);
+  }
+  base[s.name + (s.note&&s.note.includes('偏移')?' ⚠偏移':'')] = layer;
+  if (first && s.name.includes('卫星')) { layer.addTo(map); first = false; }
+}
+L.control.layers(base, null, {collapsed:false}).addTo(map);
+L.rectangle([[AOI.lat1,AOI.lon1],[AOI.lat2,AOI.lon2]],
+  {color:'#ff3333',weight:2,fill:false}).addTo(map);
+L.control.scale({metric:true}).addTo(map);
+const coord = L.control({position:'bottomleft'});
+coord.onAdd = function(){
+  const div = L.DomUtil.create('div','coord');
+  map.on('mousemove', e => div.textContent = e.latlng.lat.toFixed(6)+' , '+e.latlng.lng.toFixed(6));
+  return div;
+};
+coord.addTo(map);
+</script>
+</body>
+</html>
